@@ -4,6 +4,7 @@ sh_test(
         "integration_test.sh",
     ],
     data = [
+        "config.yaml",
         "//third_party:envoy",
         "//:authz-service",
     ],
