@@ -5,5 +5,6 @@ sh_test(
     ],
     data = [
         "//third_party:envoy",
+        "//:authz-service",
     ],
 )
