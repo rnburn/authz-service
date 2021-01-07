@@ -11,14 +11,13 @@ import (
 )
 
 type server struct {
-	users auth.Users
 }
 
 var _ envoy_service_auth_v3.AuthorizationServer = &server{}
 
 // New creates a new authorization server.
-func New(users auth.Users) envoy_service_auth_v3.AuthorizationServer {
-	return &server{users}
+func New() envoy_service_auth_v3.AuthorizationServer {
+	return &server{}
 }
 
 // Check implements authorization's Check interface which performs authorization check based on the

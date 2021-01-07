@@ -30,12 +30,9 @@ func main() {
 		log.Fatalf("failed to listen to %d: %v", *port, err)
 	}
 
-  users := make(map[string]string)
-  users["abc"] = "123"
-
 	gs := grpc.NewServer()
 
-	envoy_service_auth_v3.RegisterAuthorizationServer(gs, auth_v3.New(users))
+	envoy_service_auth_v3.RegisterAuthorizationServer(gs, auth_v3.New())
 
 	log.Printf("starting gRPC server on: %d\n", *port)
 
