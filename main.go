@@ -9,16 +9,17 @@ import (
 	envoy_service_auth_v3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	"google.golang.org/grpc"
 
-	// auth_v3 "github.com/envoyproxy/envoy/examples/ext_authz/auth/grpc-service/pkg/auth/v3"
 	auth_v3 "github.com/rnburn/authz-service/pkg/auth"
 
   "github.com/hypertrace/goagent/config"
-  // config "github.com/hypertrace/goagent"
+  "github.com/hypertrace/goagent/instrumentation/hypertrace"
 )
 
 func main() {
   cfg := config.Load()
   cfg.ServiceName = config.String("authz-service")
+  shutdown := hypertrace.Init(cfg)
+  defer shutdown()
 
 	port := flag.Int("port", 9001, "gRPC port")
 

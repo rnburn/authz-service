@@ -17,7 +17,6 @@ ENVOY_PID=$!
 sleep 5
 echo "************** testing **********"
 curl -v http://localhost:8000/service
-curl -v -H "Authorization: Bearer abc" http://localhost:8000/service
 
 # Shutdown
 echo "************** shutdown **********"
