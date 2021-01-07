@@ -11,15 +11,15 @@ import (
 
 	auth_v3 "github.com/rnburn/authz-service/pkg/auth"
 
-  "github.com/hypertrace/goagent/config"
-  "github.com/hypertrace/goagent/instrumentation/hypertrace"
+	"github.com/hypertrace/goagent/config"
+	"github.com/hypertrace/goagent/instrumentation/hypertrace"
 )
 
 func main() {
-  cfg := config.Load()
-  cfg.ServiceName = config.String("authz-service")
-  shutdown := hypertrace.Init(cfg)
-  defer shutdown()
+	cfg := config.Load()
+	cfg.ServiceName = config.String("authz-service")
+	shutdown := hypertrace.Init(cfg)
+	defer shutdown()
 
 	port := flag.Int("port", 9001, "gRPC port")
 
