@@ -29,6 +29,8 @@ func New() envoy_service_auth_v3.AuthorizationServer {
 func (s *server) Check(
 	ctx context.Context,
 	req *envoy_service_auth_v3.CheckRequest) (*envoy_service_auth_v3.CheckResponse, error) {
+  ctx, span := s.tracer.Start(ctx, "authz-request")
+  defer span.End()
 	return &envoy_service_auth_v3.CheckResponse{
 		Status: &status.Status{
 			Code: int32(code.Code_OK),
