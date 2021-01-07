@@ -14,8 +14,13 @@ AUTHZ_PID=$!
 envoy -c $TEST_DIR/config.yaml --service-cluster front-proxy &
 ENVOY_PID=$!
 
-# Shutdown
 sleep 5
+echo "************** testing **********"
+curl -v http://localhost:8000/service
+curl -v -H "Authorization: Bearer abc" http://localhost:8000/service
+
+# Shutdown
+echo "************** shutdown **********"
 kill $ENVOY_PID
 kill $UPSTREAM_PID
 kill $AUTHZ_PID
