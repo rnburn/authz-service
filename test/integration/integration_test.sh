@@ -1,7 +1,21 @@
 #!/bin/bash
 
-CONFIG=test/integration/config.yaml
+TEST_DIR=test/integration
 
-envoy --help
-envoy -c $CONFIG --service-cluster front-proxy
-# $SERVICE
+# Start upstream server
+python3 $TEST_DIR/upstream/server.py &
+UPSTREAM_PID=$!
+
+# Start authz service
+./authz-service &
+AUTHZ_PID=$!
+
+# Start envoy
+envoy -c $TEST_DIR/config.yaml --service-cluster front-proxy &
+ENVOY_PID=$!
+
+# Shutdown
+sleep 5
+kill $ENVOY_PID
+kill $UPSTREAM_PID
+kill $AUTHZ_PID
