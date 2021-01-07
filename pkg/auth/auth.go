@@ -7,17 +7,21 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
 
-	"github.com/envoyproxy/envoy/examples/ext_authz/auth/grpc-service/pkg/auth"
+  "go.opentelemetry.io/otel"
+  "go.opentelemetry.io/otel/trace"
 )
 
 type server struct {
+  tracer trace.Tracer
 }
 
 var _ envoy_service_auth_v3.AuthorizationServer = &server{}
 
 // New creates a new authorization server.
 func New() envoy_service_auth_v3.AuthorizationServer {
-	return &server{}
+	return &server{
+    tracer: otel.Tracer("authz-service"),
+  }
 }
 
 // Check implements authorization's Check interface which performs authorization check based on the
