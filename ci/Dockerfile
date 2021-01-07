@@ -7,3 +7,5 @@ ADD install_bazel.sh /3rd_party
 
 RUN /3rd_party/setup_build_environment.sh \
  && /3rd_party/install_bazel.sh
+
+ENV PATH="/usr/local/go/bin:${PATH}"
