@@ -2,12 +2,14 @@ package auth
 
 import (
 	"context"
+	"fmt"
 
 	envoy_service_auth_v3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/label"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -24,12 +26,22 @@ func New() envoy_service_auth_v3.AuthorizationServer {
 	}
 }
 
+func setSpanAttributes(span trace.Span,
+	req *envoy_service_auth_v3.AttributeContext_HttpRequest) {
+	for key, value := range req.Headers {
+		span.SetAttributes(
+			label.String(fmt.Sprintf("http.request.header.%s", key), value))
+	}
+}
+
 // Check implements authorization's Check interface which performs authorization check based on the
 // attributes associated with the incoming request.
 func (s *server) Check(
 	ctx context.Context,
 	req *envoy_service_auth_v3.CheckRequest) (*envoy_service_auth_v3.CheckResponse, error) {
-	ctx, span := s.tracer.Start(ctx, "authz-request")
+	http := req.Attributes.Request.Http
+	ctx, span := s.tracer.Start(ctx, http.Method)
+	setSpanAttributes(span, http)
 	defer span.End()
 	return &envoy_service_auth_v3.CheckResponse{
 		Status: &status.Status{
