@@ -28,6 +28,7 @@ func New() envoy_service_auth_v3.AuthorizationServer {
 
 func setSpanAttributes(span trace.Span,
 	req *envoy_service_auth_v3.AttributeContext_HttpRequest) {
+  span.SetAttributes(label.String("http.url", req.Method))
 	for key, value := range req.Headers {
 		span.SetAttributes(
 			label.String(fmt.Sprintf("http.request.header.%s", key), value))
