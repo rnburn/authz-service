@@ -3,10 +3,12 @@ package auth
 import (
 	"context"
 	"fmt"
+  "time"
 
 	envoy_service_auth_v3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
+  "github.com/golang/protobuf/ptypes"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/label"
@@ -40,8 +42,12 @@ func setSpanAttributes(span trace.Span,
 func (s *server) Check(
 	ctx context.Context,
 	req *envoy_service_auth_v3.CheckRequest) (*envoy_service_auth_v3.CheckResponse, error) {
+  timestamp, err := ptypes.Timestamp(req.Attributes.Request.Time)
+  if err != nil {
+    timestamp = time.Now()
+  }
 	http := req.Attributes.Request.Http
-	ctx, span := s.tracer.Start(ctx, http.Method)
+	ctx, span := s.tracer.Start(ctx, http.Method, trace.WithTimestamp(timestamp))
 	setSpanAttributes(span, http)
 	defer span.End()
 	return &envoy_service_auth_v3.CheckResponse{
