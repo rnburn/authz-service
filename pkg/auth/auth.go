@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
   "time"
+  "strings"
 
 	envoy_config_v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
 	envoy_service_auth_v3 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v3"
@@ -17,6 +18,12 @@ import (
   "go.opentelemetry.io/otel/semconv"
 )
 
+// contentTypeAllowList is the list of allowed content types in lowercase
+var contentTypeAllowListLowerCase = []string{
+	"application/json",
+	"application/x-www-form-urlencoded",
+}
+
 type server struct {
 	tracer trace.Tracer
 }
@@ -28,6 +35,30 @@ func New() envoy_service_auth_v3.AuthorizationServer {
 	return &server{
 		tracer: otel.Tracer("authz-service"),
 	}
+}
+
+func shouldRecordBody(content_type string) bool {
+  for _, recordableContentType := range contentTypeAllowListLowerCase {
+    if strings.Contains(content_type, recordableContentType) {
+      return true
+    }
+  }
+  return false
+}
+
+func setRequestBody(span trace.Span, req* envoy_service_auth_v3.AttributeContext_HttpRequest) {
+  if len(req.Body) == 0 && len(req.RawBody) == 0 {
+    return
+  }
+  content_type := strings.ToLower(req.Headers["Content-Type"])
+  if !shouldRecordBody(content_type) {
+    return
+  }
+  if len(req.Body) > 0 {
+    span.SetAttributes(label.String("http.request.body", req.Body))
+  } else {
+    span.SetAttributes(label.String("http.request.body", string(req.RawBody)))
+  }
 }
 
 func setSpanAttributes(span trace.Span,
