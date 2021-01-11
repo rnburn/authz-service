@@ -39,11 +39,21 @@ func setSpanAttributes(span trace.Span,
 	}
 }
 
+func setPortAttribute(span trace.Span, key label.Key, address *envoy_config_v3.SocketAddress) {
+  switch address.PortSpecifier.(type) {
+    case *envoy_config_v3.SocketAddress_PortValue:
+      span.SetAttributes(key.Int(int(address.GetPortValue())))
+    case *envoy_config_v3.SocketAddress_NamedPort:
+      span.SetAttributes(key.String(address.GetNamedPort()))
+  }
+}
+
 func setSourcePeer(span trace.Span,
   source *envoy_service_auth_v3.AttributeContext_Peer) {
     switch address := source.Address.Address.(type) {
     case *envoy_config_v3.Address_SocketAddress:
       span.SetAttributes(semconv.NetPeerIPKey.String(address.SocketAddress.Address))
+      setPortAttribute(span, semconv.NetPeerPortKey, address.SocketAddress)
     case *envoy_config_v3.Address_Pipe:
       return
     }
