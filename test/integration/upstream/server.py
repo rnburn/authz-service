@@ -5,6 +5,7 @@ app = Flask(__name__)
 
 @app.route('/service')
 def hello():
+  print(request.headers)
   return 'Hello, Hello'
 
 
