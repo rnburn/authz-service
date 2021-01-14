@@ -24,6 +24,18 @@ var contentTypeAllowListLowerCase = []string{
 	"application/x-www-form-urlencoded",
 }
 
+type textMapCarrier struct {
+  headers map[string]string
+}
+
+func (carrier *textMapCarrier) Get(key string) string {
+  return carrier.headers[key]
+}
+
+func (carrier *textMapCarrier) Set(key string, value string) {
+  carrier.headers[key] = value
+}
+
 type server struct {
 	tracer trace.Tracer
 }
@@ -100,6 +112,9 @@ func (s *server) Check(
     timestamp = time.Now()
   }
 	http := req.Attributes.Request.Http
+  propagator := otel.GetTextMapPropagator()
+  carrier := textMapCarrier{http.Headers}
+  ctx = propagator.Extract(ctx, &carrier)
 	ctx, span := s.tracer.Start(ctx, http.Method, trace.WithTimestamp(timestamp))
   setSourcePeer(span, req.Attributes.Source)
 	setSpanAttributes(span, http)
