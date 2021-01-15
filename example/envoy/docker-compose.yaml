@@ -10,6 +10,13 @@ services:
     ports:
       - "8000:8000"
 
+  authz-service:
+    build:
+      context: ./authz
+      dockerfile: service/Dockerfile
+    networks:
+      - envoymesh
+
   upstream-service:
     build:
       context: ./upstream
