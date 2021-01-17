@@ -11,6 +11,7 @@ import (
 	"google.golang.org/genproto/googleapis/rpc/code"
 	"google.golang.org/genproto/googleapis/rpc/status"
   "github.com/golang/protobuf/ptypes"
+  "google.golang.org/grpc/metadata"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/label"
@@ -25,15 +26,19 @@ var contentTypeAllowListLowerCase = []string{
 }
 
 type textMapCarrier struct {
-  headers map[string]string
+  headers map[string][]string
 }
 
 func (carrier *textMapCarrier) Get(key string) string {
-  return carrier.headers[key]
+  values := carrier.headers[key]
+  if len(values) > 0 {
+    return values[0]
+  } else {
+    return ""
+  }
 }
 
 func (carrier *textMapCarrier) Set(key string, value string) {
-  carrier.headers[key] = value
 }
 
 type server struct {
@@ -77,6 +82,7 @@ func setSpanAttributes(span trace.Span,
 	req *envoy_service_auth_v3.AttributeContext_HttpRequest) {
   span.SetAttributes(label.String("http.url", req.Path))
 	for key, value := range req.Headers {
+    fmt.Printf("kv: %s\t%s\n", key, value)    
 		span.SetAttributes(
 			label.String(fmt.Sprintf("http.request.header.%s", key), value))
 	}
@@ -113,8 +119,11 @@ func (s *server) Check(
   }
 	http := req.Attributes.Request.Http
   propagator := otel.GetTextMapPropagator()
-  carrier := textMapCarrier{http.Headers}
-  ctx = propagator.Extract(ctx, &carrier)
+  md, ok := metadata.FromIncomingContext(ctx)
+  if ok {
+    carrier := textMapCarrier{md}
+    ctx = propagator.Extract(ctx, &carrier)
+  }
 	ctx, span := s.tracer.Start(ctx, http.Method, trace.WithTimestamp(timestamp))
   setSourcePeer(span, req.Attributes.Source)
 	setSpanAttributes(span, http)
