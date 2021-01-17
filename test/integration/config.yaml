@@ -12,13 +12,13 @@ static_resources:
           generate_request_id: true
           tracing:
             provider:
-              name: envoy.tracers.zipkin
+              name: envoy.tracers.opencensus
               typed_config:
-                "@type": type.googleapis.com/envoy.config.trace.v3.ZipkinConfig
-                collector_cluster: zipkin
-                collector_endpoint: "/api/v2/spans"
-                collector_endpoint_version: HTTP_JSON
-                shared_span_context: false
+                "@type": type.googleapis.com/envoy.config.trace.v3.OpenCensusConfig
+                zipkin_exporter_enabled: true
+                zipkin_url: "http://127.0.0.1:9411/api/v2/spans"
+                outgoing_trace_context:
+                - TRACE_CONTEXT
           codec_type: auto
           stat_prefix: ingress_http
           route_config:

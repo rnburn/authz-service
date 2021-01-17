@@ -5,10 +5,6 @@ from opentelemetry.exporter import zipkin
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchExportSpanProcessor
 from opentelemetry.instrumentation.flask import FlaskInstrumentor
-from opentelemetry import propagators
-from opentelemetry.sdk.trace.propagation.b3_format import B3Format
-
-propagators.set_global_textmap(B3Format())
 
 trace.set_tracer_provider(TracerProvider())
 tracer = trace.get_tracer(__name__)

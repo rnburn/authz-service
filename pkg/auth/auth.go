@@ -82,7 +82,6 @@ func setSpanAttributes(span trace.Span,
 	req *envoy_service_auth_v3.AttributeContext_HttpRequest) {
   span.SetAttributes(label.String("http.url", req.Path))
 	for key, value := range req.Headers {
-    fmt.Printf("kv: %s\t%s\n", key, value)    
 		span.SetAttributes(
 			label.String(fmt.Sprintf("http.request.header.%s", key), value))
 	}
