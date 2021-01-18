@@ -32,6 +32,7 @@ type textMapCarrier struct {
 func (carrier *textMapCarrier) Get(key string) string {
   values := carrier.headers[key]
   if len(values) > 0 {
+    fmt.Printf("Get key: %s\t%s\n", key, values[0])
     return values[0]
   } else {
     return ""
