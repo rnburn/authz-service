@@ -1,6 +1,7 @@
 package auth
 
 import (
+  "os"
 	"context"
 	"fmt"
   "time"
@@ -124,7 +125,11 @@ func (s *server) Check(
     carrier := textMapCarrier{md}
     ctx = propagator.Extract(ctx, &carrier)
   }
+  pctx := trace.RemoteSpanContextFromContext(ctx)
+  fmt.Fprintf(os.Stderr, "parent TraceID %s\n", pctx.TraceID.String())
+  _ = pctx
 	ctx, span := s.tracer.Start(ctx, http.Method, trace.WithTimestamp(timestamp))
+  fmt.Fprintf(os.Stderr, "span TraceID %s\n", span.SpanContext().TraceID.String())
   setSourcePeer(span, req.Attributes.Source)
 	setSpanAttributes(span, http)
 	defer span.End()
