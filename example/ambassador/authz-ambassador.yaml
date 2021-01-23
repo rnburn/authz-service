@@ -1,0 +1,19 @@
+---
+apiVersion: getambassador.io/v2
+kind: Filter
+metadata:
+  name: authentication
+spec:
+  External:
+    auth_service: "example-auth:9001"
+---
+apiVersion: getambassador.io/v2
+kind: FilterPolicy
+metadata:
+  name: authentication
+spec:
+  rules:
+  - host: "*"
+    path: /*
+    filters:
+    - name: authentication
