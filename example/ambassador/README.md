@@ -41,7 +41,15 @@ kubectl apply -f https://kind.sigs.k8s.io/examples/ingress/usage.yaml
 ```
 kubectl annotate ingress example-ingress kubernetes.io/ingress.class=ambassador
 ```
-7. Test services
+7. Set up zipkin
+```
+kubectl appl -f zipkin.yaml
+```
+8. Restart ambassador (needed to pick up tracing configuration)
+```
+kubectl rollout restart deployment -n ambassador
+```
+9. Test services
 ```
 curl localhost/foo
 curl localhost/bar

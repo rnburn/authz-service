@@ -4,11 +4,9 @@ kind: TracingService
 metadata:
   name: tracing
 spec:
-  service: "zipkin:9411"
+  service: "zipkin.default:9411"
   driver: zipkin
   config: {}
-sampling:
-  random: 100
 ---
 apiVersion: apps/v1
 kind: Deployment
