@@ -33,11 +33,8 @@ func main() {
 
 	gs := grpc.NewServer()
 
-  if true {
-	  envoy_service_auth_v3.RegisterAuthorizationServer(gs, auth.NewServerV3())
-  } else {
-    envoy_service_auth_v2.RegisterAuthorizationServer(gs, auth.NewServerV2())
-  }
+  envoy_service_auth_v3.RegisterAuthorizationServer(gs, auth.NewServerV3())
+  envoy_service_auth_v2.RegisterAuthorizationServer(gs, auth.NewServerV2())
 
 	log.Printf("starting gRPC server on: %d\n", *port)
 
