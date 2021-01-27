@@ -1,0 +1,8 @@
+---
+apiVersion: getambassador.io/v2
+kind: AuthService
+metadata:
+  name: authentication
+spec:
+  auth_service: "example-auth.default:9001"
+  proto: grpc

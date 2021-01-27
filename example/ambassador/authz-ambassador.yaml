@@ -5,7 +5,7 @@ metadata:
   name: authentication
 spec:
   External:
-    auth_service: "example-auth:9001"
+    auth_service: "example-auth.default:9001"
 ---
 apiVersion: getambassador.io/v2
 kind: FilterPolicy
