@@ -1,19 +1,8 @@
 ---
 apiVersion: getambassador.io/v2
-kind: Filter
+kind: AuthService
 metadata:
   name: authentication
 spec:
-  External:
-    auth_service: "example-auth.default:9001"
----
-apiVersion: getambassador.io/v2
-kind: FilterPolicy
-metadata:
-  name: authentication
-spec:
-  rules:
-  - host: "*"
-    path: /*
-    filters:
-    - name: authentication
+  auth_service: "example-auth.default:9001"
+  proto: grpc

@@ -43,14 +43,39 @@ kubectl annotate ingress example-ingress kubernetes.io/ingress.class=ambassador
 ```
 7. Set up zipkin
 ```
-kubectl appl -f zipkin.yaml
+kubectl apply -f zipkin.yaml
 ```
 8. Restart ambassador (needed to pick up tracing configuration)
 ```
 kubectl rollout restart deployment -n ambassador
 ```
-9. Test services
+9. Set up authentication
+```
+kubectl apply -f authz.yaml
+kubectl apply -f authz-ambassador.yaml
+```
+10. Test services
 ```
 curl localhost/foo
 curl localhost/bar
+```
+11. View results in zipkin:
+```
+kubectl get pods
+```
+Returns something like
+```
+NAME                            READY   STATUS    RESTARTS   AGE
+bar-app                         1/1     Running   0          28m
+example-auth-79746f86c9-zc6js   1/1     Running   0          27m
+foo-app                         1/1     Running   0          28m
+zipkin-68bdbf69f6-9gwp5         1/1     Running   0          27m
+```
+Make zipkin accessible
+```
+kubectl port-forward zipkin-68bdbf69f6-9gwp5 9411
+```
+In browser, go to
+```
+localhost:9411
 ```
