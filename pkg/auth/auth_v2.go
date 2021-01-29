@@ -32,6 +32,7 @@ func NewServerV2() envoy_service_auth_v2.AuthorizationServer {
 }
 
 func setRequestBodyV2(span trace.Span, req* envoy_service_auth_v2.AttributeContext_HttpRequest) {
+  span.SetAttributes(label.String("http.request.body*", fmt.Sprintf("{%s}", req.Body)))
   if len(req.Body) == 0 {
     return
   }
