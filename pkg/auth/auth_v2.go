@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
   "time"
-  "strings"
 
 	envoy_config_v2 "github.com/envoyproxy/go-control-plane/envoy/api/v2/core"
 	envoy_service_auth_v2 "github.com/envoyproxy/go-control-plane/envoy/service/auth/v2"
@@ -36,8 +35,7 @@ func setRequestBodyV2(span trace.Span, req* envoy_service_auth_v2.AttributeConte
   if len(req.Body) == 0 {
     return
   }
-  content_type := strings.ToLower(req.Headers["Content-Type"])
-  if !shouldRecordBody(content_type) {
+  if !shouldRecordBody(req.Headers["content-Type"]) {
     return
   }
   span.SetAttributes(label.String("http.request.body", req.Body))
@@ -45,6 +43,7 @@ func setRequestBodyV2(span trace.Span, req* envoy_service_auth_v2.AttributeConte
 
 func setSpanAttributesV2(span trace.Span,
 	req *envoy_service_auth_v2.AttributeContext_HttpRequest) {
+  setRequestBodyV2(span, req) 
   span.SetAttributes(label.String("http.url", req.Path))
 	for key, value := range req.Headers {
 		span.SetAttributes(

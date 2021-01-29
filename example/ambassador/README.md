@@ -56,8 +56,8 @@ kubectl apply -f authz-ambassador.yaml
 ```
 10. Test services
 ```
-curl localhost/foo
-curl localhost/bar
+curl -H "Content-Type: application/json" --data '{"abc": 123}' -v localhost/bar
+curl -H "Content-Type: application/json" --data '{"abc": 123}' -v localhost/foo
 ```
 11. View results in zipkin:
 ```

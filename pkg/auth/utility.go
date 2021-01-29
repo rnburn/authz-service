@@ -11,6 +11,7 @@ var contentTypeAllowListLowerCase = []string{
 }
 
 func shouldRecordBody(content_type string) bool {
+  content_type = strings.ToLower(content_type)
   for _, recordableContentType := range contentTypeAllowListLowerCase {
     if strings.Contains(content_type, recordableContentType) {
       return true

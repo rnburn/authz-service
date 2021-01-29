@@ -6,3 +6,6 @@ metadata:
 spec:
   auth_service: "example-auth.default:9001"
   proto: grpc
+  include_body:
+    max_bytes:  4096
+    allow_partial: true
