@@ -14,12 +14,15 @@ import (
 
 	"github.com/hypertrace/goagent/config"
 	"github.com/hypertrace/goagent/instrumentation/hypertrace"
+  "go.opentelemetry.io/otel"
+  "go.opentelemetry.io/otel/propagation"
+  "go.opentelemetry.io/contrib/propagators/b3"
 )
 
 func main() {
-	cfg := config.Load()
-	cfg.ServiceName = config.String("authz-service")
-	shutdown := hypertrace.Init(cfg)
+	hypertraceConfig := config.Load()
+	hypertraceConfig.ServiceName = config.String("authz-service")
+	shutdown := hypertrace.Init(hypertraceConfig)
 	defer shutdown()
 
 	port := flag.Int("port", 9001, "gRPC port")
@@ -31,12 +34,19 @@ func main() {
 		log.Fatalf("failed to listen to %d: %v", *port, err)
 	}
 
+  authzConfig := auth.LoadConfig()
+  if authzConfig.PropagationMode == auth.B3PropagationMode {
+    otel.SetTextMapPropagator(b3.B3{})
+  } else if authzConfig.PropagationMode == auth.TraceContextPropagationMode {
+    otel.SetTextMapPropagator(propagation.TraceContext{})
+  }
+
 	gs := grpc.NewServer()
 
   envoy_service_auth_v3.RegisterAuthorizationServer(gs, auth.NewServerV3())
   envoy_service_auth_v2.RegisterAuthorizationServer(gs, auth.NewServerV2())
 
-	log.Printf("starting gRPC server on: %d\n", *port)
+	log.Printf("starting gRPC server on: %d\n", authzConfig.Port)
 
 	gs.Serve(lis)
 }
