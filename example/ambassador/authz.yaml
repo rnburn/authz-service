@@ -32,6 +32,9 @@ spec:
       - name: example-auth
         image: rnburn/ambassador-authz
         imagePullPolicy: Always
+        env:
+        - name: HT_AUTHZ_PROPAGATION_MODE
+          value: B3
         ports:
         - name: http-api
           containerPort: 9001
