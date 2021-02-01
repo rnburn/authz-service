@@ -1,7 +1,7 @@
 package auth
 
 import (
-  "strings"
+	"strings"
 )
 
 // contentTypeAllowList is the list of allowed content types in lowercase
@@ -11,11 +11,11 @@ var contentTypeAllowListLowerCase = []string{
 }
 
 func shouldRecordBody(headers map[string]string) bool {
-  contentType := strings.ToLower(headers["content-type"])
-  for _, recordableContentType := range contentTypeAllowListLowerCase {
-    if strings.Contains(contentType, recordableContentType) {
-      return true
-    }
-  }
-  return false
+	contentType := strings.ToLower(headers["content-type"])
+	for _, recordableContentType := range contentTypeAllowListLowerCase {
+		if strings.Contains(contentType, recordableContentType) {
+			return true
+		}
+	}
+	return false
 }

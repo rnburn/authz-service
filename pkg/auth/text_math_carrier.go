@@ -1,21 +1,21 @@
 package auth
 
 import (
-  "fmt"
+	"fmt"
 )
 
 type textMapCarrier struct {
-  headers map[string][]string
+	headers map[string][]string
 }
 
 func (carrier *textMapCarrier) Get(key string) string {
-  values := carrier.headers[key]
-  if len(values) > 0 {
-    fmt.Printf("Get key: %s\t%s\n", key, values[0])
-    return values[0]
-  } else {
-    return ""
-  }
+	values := carrier.headers[key]
+	if len(values) > 0 {
+		fmt.Printf("Get key: %s\t%s\n", key, values[0])
+		return values[0]
+	} else {
+		return ""
+	}
 }
 
 func (carrier *textMapCarrier) Set(key string, value string) {

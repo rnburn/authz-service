@@ -10,8 +10,8 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/label"
+	"go.opentelemetry.io/otel/semconv"
 	"go.opentelemetry.io/otel/trace"
-  "go.opentelemetry.io/otel/semconv"
 )
 
 type serverV3 struct {
@@ -27,45 +27,45 @@ func NewServerV3() envoy_service_auth_v3.AuthorizationServer {
 	}
 }
 
-func setRequestBodyV3(span trace.Span, req* envoy_service_auth_v3.AttributeContext_HttpRequest) {
-  if len(req.Body) == 0 && len(req.RawBody) == 0 {
-    return
-  }
-  if !shouldRecordBody(req.Headers) {
-    return
-  }
-  if len(req.Body) > 0 {
-    span.SetAttributes(label.String("http.request.body", req.Body))
-  } else {
-    span.SetAttributes(label.String("http.request.body", string(req.RawBody)))
-  }
+func setRequestBodyV3(span trace.Span, req *envoy_service_auth_v3.AttributeContext_HttpRequest) {
+	if len(req.Body) == 0 && len(req.RawBody) == 0 {
+		return
+	}
+	if !shouldRecordBody(req.Headers) {
+		return
+	}
+	if len(req.Body) > 0 {
+		span.SetAttributes(label.String("http.request.body", req.Body))
+	} else {
+		span.SetAttributes(label.String("http.request.body", string(req.RawBody)))
+	}
 }
 
 func setSpanAttributesV3(span trace.Span,
 	req *envoy_service_auth_v3.AttributeContext_HttpRequest) {
-  setRequestBodyV3(span, req) 
-  span.SetAttributes(label.String("http.url", req.Path))
-  setHeaderAnnotations(span, req.Headers)
+	setRequestBodyV3(span, req)
+	span.SetAttributes(label.String("http.url", req.Path))
+	setHeaderAnnotations(span, req.Headers)
 }
 
 func setPortAttributeV3(span trace.Span, key label.Key, address *envoy_config_v3.SocketAddress) {
-  switch address.PortSpecifier.(type) {
-    case *envoy_config_v3.SocketAddress_PortValue:
-      span.SetAttributes(key.Int(int(address.GetPortValue())))
-    case *envoy_config_v3.SocketAddress_NamedPort:
-      span.SetAttributes(key.String(address.GetNamedPort()))
-  }
+	switch address.PortSpecifier.(type) {
+	case *envoy_config_v3.SocketAddress_PortValue:
+		span.SetAttributes(key.Int(int(address.GetPortValue())))
+	case *envoy_config_v3.SocketAddress_NamedPort:
+		span.SetAttributes(key.String(address.GetNamedPort()))
+	}
 }
 
 func setSourcePeerV3(span trace.Span,
-  source *envoy_service_auth_v3.AttributeContext_Peer) {
-    switch address := source.Address.Address.(type) {
-    case *envoy_config_v3.Address_SocketAddress:
-      span.SetAttributes(semconv.NetPeerIPKey.String(address.SocketAddress.Address))
-      setPortAttributeV3(span, semconv.NetPeerPortKey, address.SocketAddress)
-    case *envoy_config_v3.Address_Pipe:
-      return
-    }
+	source *envoy_service_auth_v3.AttributeContext_Peer) {
+	switch address := source.Address.Address.(type) {
+	case *envoy_config_v3.Address_SocketAddress:
+		span.SetAttributes(semconv.NetPeerIPKey.String(address.SocketAddress.Address))
+		setPortAttributeV3(span, semconv.NetPeerPortKey, address.SocketAddress)
+	case *envoy_config_v3.Address_Pipe:
+		return
+	}
 }
 
 // Check implements authorization's Check interface which performs authorization check based on the
@@ -74,8 +74,8 @@ func (s *serverV3) Check(
 	ctx context.Context,
 	req *envoy_service_auth_v3.CheckRequest) (*envoy_service_auth_v3.CheckResponse, error) {
 	http := req.Attributes.Request.Http
-  ctx, span := startSpan(ctx, s.tracer, req.Attributes.Request.Time, http.Method)
-  setSourcePeerV3(span, req.Attributes.Source)
+	ctx, span := startSpan(ctx, s.tracer, req.Attributes.Request.Time, http.Method)
+	setSourcePeerV3(span, req.Attributes.Source)
 	setSpanAttributesV3(span, http)
 	defer span.End()
 	return &envoy_service_auth_v3.CheckResponse{
