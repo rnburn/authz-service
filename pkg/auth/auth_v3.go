@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
   "time"
 
 	envoy_config_v3 "github.com/envoyproxy/go-control-plane/envoy/config/core/v3"
@@ -49,10 +48,7 @@ func setSpanAttributesV3(span trace.Span,
 	req *envoy_service_auth_v3.AttributeContext_HttpRequest) {
   setRequestBodyV3(span, req) 
   span.SetAttributes(label.String("http.url", req.Path))
-	for key, value := range req.Headers {
-		span.SetAttributes(
-			label.String(fmt.Sprintf("http.request.header.%s", key), value))
-	}
+  setHeaderAnnotations(span, req.Headers)
 }
 
 func setPortAttributeV3(span trace.Span, key label.Key, address *envoy_config_v3.SocketAddress) {
