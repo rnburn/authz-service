@@ -35,7 +35,7 @@ func setRequestBodyV2(span trace.Span, req* envoy_service_auth_v2.AttributeConte
   if len(req.Body) == 0 {
     return
   }
-  if !shouldRecordBody(req.Headers["content-type"]) {
+  if !shouldRecordBody(req.Headers) {
     return
   }
   span.SetAttributes(label.String("http.request.body", req.Body))

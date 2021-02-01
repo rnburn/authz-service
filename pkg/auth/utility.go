@@ -10,10 +10,10 @@ var contentTypeAllowListLowerCase = []string{
 	"application/x-www-form-urlencoded",
 }
 
-func shouldRecordBody(content_type string) bool {
-  content_type = strings.ToLower(content_type)
+func shouldRecordBody(headers map[string]string) bool {
+  contentType := strings.ToLower(headers["content-type"])
   for _, recordableContentType := range contentTypeAllowListLowerCase {
-    if strings.Contains(content_type, recordableContentType) {
+    if strings.Contains(contentType, recordableContentType) {
       return true
     }
   }

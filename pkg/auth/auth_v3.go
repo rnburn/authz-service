@@ -35,7 +35,7 @@ func setRequestBodyV3(span trace.Span, req* envoy_service_auth_v3.AttributeConte
   if len(req.Body) == 0 && len(req.RawBody) == 0 {
     return
   }
-  if !shouldRecordBody(req.Headers["content-type"]) {
+  if !shouldRecordBody(req.Headers) {
     return
   }
   if len(req.Body) > 0 {
