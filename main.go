@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -25,15 +24,10 @@ func main() {
 	shutdown := hypertrace.Init(hypertraceConfig)
 	defer shutdown()
 
-	port := flag.Int("port", 9001, "gRPC port")
-
-	flag.Parse()
-
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
-	if err != nil {
-		log.Fatalf("failed to listen to %d: %v", *port, err)
-	}
-
+  // Ambassador only works with b3 propagation, so we support configuring it.
+  //    See https://datawire-oss.slack.com/archives/CAULN7S76/p1611811639150700
+  // This might be removed in the future if configurable propagation is supported directly
+  // in the hypertrace agents.
 	authzConfig := auth.LoadConfig()
 	if authzConfig.PropagationMode == auth.B3PropagationMode {
 		otel.SetTextMapPropagator(b3.B3{})
@@ -41,8 +35,15 @@ func main() {
 		otel.SetTextMapPropagator(propagation.TraceContext{})
 	}
 
-	gs := grpc.NewServer()
 
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", authzConfig.Port))
+	if err != nil {
+		log.Fatalf("failed to listen to %d: %v", authzConfig.Port, err)
+	}
+
+
+  // Support both Envoy's v2 and v3 protcols
+	gs := grpc.NewServer()
 	envoy_service_auth_v3.RegisterAuthorizationServer(gs, auth.NewServerV3())
 	envoy_service_auth_v2.RegisterAuthorizationServer(gs, auth.NewServerV2())
 
