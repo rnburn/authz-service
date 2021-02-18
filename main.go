@@ -51,10 +51,13 @@ func main() {
 	envoy_service_auth_v2.RegisterAuthorizationServer(gs, auth.NewServerV2())
 
 	log.Printf("starting gRPC server on: %d\n", authzConfig.Port)
-
-  // from https://www.alexsears.com/2019/10/fun-with-concurrency-in-golang/
 	go gs.Serve(lis)
 
+  // Run a server for capturing responses
+  responseServer := auth.NewResponseCaptureServer()
+  go responseServer.Run()
+
+  // from https://www.alexsears.com/2019/10/fun-with-concurrency-in-golang/
   signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGTERM)
 	<-signals
