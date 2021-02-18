@@ -20,3 +20,11 @@ func (carrier *textMapCarrier) Get(key string) string {
 
 func (carrier *textMapCarrier) Set(key string, value string) {
 }
+
+func (carrier *textMapCarrier) Keys() []string {
+  var result []string
+  for k, _ := range carrier.headers {
+    result = append(result, k)
+  }
+  return result
+}
