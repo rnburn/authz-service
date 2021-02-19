@@ -1,5 +1,6 @@
 # Ambassador Example
 
+## Request capture
 1. Install kind `https://kind.sigs.k8s.io/`
 2. Create a cluster
 ```
@@ -78,4 +79,14 @@ kubectl port-forward zipkin-68bdbf69f6-9gwp5 9411
 In browser, go to
 ```
 localhost:9411
+```
+
+## Response Capture
+1. Expose authz's response capture port as an ingress (neeed to have envoy make a cluster for it).
+```
+kubectl apply -f authz-response.yaml
+```
+2. Add a lua script to ambassador so that envoy calls out to the response service when it enters the response processing stage
+```
+kubectl apply -f ambassador-lua.yaml
 ```
