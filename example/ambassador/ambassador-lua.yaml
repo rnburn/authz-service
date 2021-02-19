@@ -6,13 +6,14 @@ spec:
   config:
     lua_scripts: |
       function envoy_on_response(response_handle)
-        response_handle:httpCall(
+        local headers, body = response_handle:httpCall(
           "cluster_example_auth_default_8080_default",
           {
-            [":method"] = "POST",
-            [":path"] = "/response"
+            [":method"] = "GET",
+            [":path"] = "/response",
+            #["Content-Type"] = "application/json"
           },
-          "Hello, hello, is there anybody out there?",
+          "", #"Hello, hello, is there anybody out there?",
           5000
         )
         response_handle:headers():add("Lua-Scripts-Enabled", "Processed")

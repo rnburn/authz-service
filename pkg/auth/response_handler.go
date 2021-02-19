@@ -23,6 +23,7 @@ func NewResponseCaptureServer() *responseCaptureServer {
 func (server *responseCaptureServer) ServeHTTP(responseWriter http.ResponseWriter, request * http.Request) {
   ctx := context.Background()   
   ctx, span := server.tracer.Start(ctx, "response capture")
+  fmt.Printf("incomming http request")
   fmt.Fprintf(responseWriter, "nod\n")
   defer span.End()
 }
@@ -31,6 +32,6 @@ func (server *responseCaptureServer) ServeHTTP(responseWriter http.ResponseWrite
 func (server *responseCaptureServer) Run() {
   port := 8080
   fmt.Printf("Listening for responses on: %d\n", port)
-  http.Handle("/response", server)
+  http.Handle("/", server)
   log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", port), nil))
 }

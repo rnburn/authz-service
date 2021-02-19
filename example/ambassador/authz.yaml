@@ -12,8 +12,9 @@ spec:
     name: http-example-auth
     targetPort: http-api
   - port: 8080
+    protocol: TCP
     name: response-capture
-    targetPort: http-api
+    targetPort: response
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -33,7 +34,7 @@ spec:
     spec:
       containers:
       - name: example-auth
-        image: rnburn/ambassador-authz:0.4
+        image: rnburn/ambassador-authz:0.5
         imagePullPolicy: Always
         env:
         - name: HT_AUTHZ_PROPAGATION_MODE
