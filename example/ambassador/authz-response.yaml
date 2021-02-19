@@ -1,0 +1,12 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: response-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /response
+        backend:
+          serviceName: example-auth
+          servicePort: 8080

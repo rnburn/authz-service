@@ -23,6 +23,7 @@ func NewResponseCaptureServer() *responseCaptureServer {
 func (server *responseCaptureServer) ServeHTTP(responseWriter http.ResponseWriter, request * http.Request) {
   ctx := context.Background()   
   ctx, span := server.tracer.Start(ctx, "response capture")
+  fmt.Fprintf(responseWriter, "nod\n")
   defer span.End()
 }
 
