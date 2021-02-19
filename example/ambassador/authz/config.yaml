@@ -1,3 +1,2 @@
-service_name: authz
 reporting:
   endpoint: http://zipkin:9411/api/v2/spans

@@ -51,7 +51,7 @@ func main() {
 	envoy_service_auth_v2.RegisterAuthorizationServer(gs, auth.NewServerV2())
 
 	log.Printf("starting gRPC server on: %d\n", authzConfig.Port)
-	go gs.Serve(lis)
+	gs.Serve(lis)
 
   /*
   // Run a server for capturing responses
