@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: example-auth
-        image: rnburn/ambassador-authz:0.8
+        image: rnburn/ambassador-authz:0.9
         imagePullPolicy: Always
         env:
         - name: HT_AUTHZ_PROPAGATION_MODE
