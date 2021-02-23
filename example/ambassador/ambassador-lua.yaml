@@ -6,6 +6,7 @@ spec:
   config:
     lua_scripts: |
       function envoy_on_response(response_handle)
+        local response_body = response_handle:body(true)
         local headers, body = response_handle:httpCall(
           "cluster_example_auth_default_8080_default",
           {
@@ -13,7 +14,7 @@ spec:
             [":path"] = "/response",
             [":authority"] = "lua_cluster"
           },
-          "Hello, hello, is there anybody out there?",
+          response_body:getBytes(0, response_body:length()),
           5000)
         response_handle:headers():add("Lua-Scripts-Enabled", "Processed")
       end
