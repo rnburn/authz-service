@@ -9,12 +9,11 @@ spec:
         local headers, body = response_handle:httpCall(
           "cluster_example_auth_default_8080_default",
           {
-            [":method"] = "GET",
+            [":method"] = "POST",
             [":path"] = "/response",
-            #["Content-Type"] = "application/json"
+            [":authority"] = "lua_cluster"
           },
-          "", #"Hello, hello, is there anybody out there?",
-          5000
-        )
+          "Hello, hello, is there anybody out there?",
+          5000)
         response_handle:headers():add("Lua-Scripts-Enabled", "Processed")
       end
