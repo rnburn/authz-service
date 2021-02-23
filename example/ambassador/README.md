@@ -86,7 +86,11 @@ localhost:9411
 ```
 kubectl apply -f authz-response.yaml
 ```
-2. Add a lua script to ambassador so that envoy calls out to the response service when it enters the response processing stage
+2. Tell ambassador about our response ingress
+```
+kubectl annotate ingress response-ingress kubernetes.io/ingress.class=ambassador
+```
+3. Add a lua script to ambassador so that envoy calls out to the response service when it enters the response processing stage
 ```
 kubectl apply -f ambassador-lua.yaml
 ```
