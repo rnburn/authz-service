@@ -5,8 +5,10 @@ import (
   "log"
   "context"
   "net/http"
+  "bytes"
 
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/label"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -23,6 +25,10 @@ func NewResponseCaptureServer() *responseCaptureServer {
 func (server *responseCaptureServer) ServeHTTP(responseWriter http.ResponseWriter, request * http.Request) {
   ctx := context.Background()   
   ctx, span := server.tracer.Start(ctx, "response capture")
+  buffer := new(bytes.Buffer)
+  buffer.ReadFrom(request.Body)
+  span.SetAttributes(
+			label.String("http.response.body", buffer.String()))
   fmt.Printf("incomming http request")
   fmt.Fprintf(responseWriter, "nod\n")
   defer span.End()
