@@ -3,7 +3,6 @@ package auth
 import (
   "fmt"
   "log"
-  "context"
   "net/http"
   "bytes"
 
@@ -23,13 +22,14 @@ func NewResponseCaptureServer() *responseCaptureServer {
 }
 
 func (server *responseCaptureServer) ServeHTTP(responseWriter http.ResponseWriter, request * http.Request) {
-  ctx := context.Background()   
+	propagator := otel.GetTextMapPropagator()
+  ctx := propagator.Extract(request.Context(), request.Header)
   ctx, span := server.tracer.Start(ctx, "response capture")
   buffer := new(bytes.Buffer)
   buffer.ReadFrom(request.Body)
   span.SetAttributes(
 			label.String("http.response.body", buffer.String()))
-  fmt.Printf("incomming http request")
+  fmt.Printf("incoming http request")
   fmt.Fprintf(responseWriter, "nod\n")
   defer span.End()
 }
