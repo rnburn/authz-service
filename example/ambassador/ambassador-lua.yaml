@@ -15,6 +15,6 @@ spec:
             [":authority"] = "lua_cluster"
           },
           response_body:getBytes(0, response_body:length()),
-          5000)
+          5000, true)
         response_handle:headers():add("Lua-Scripts-Enabled", "Processed")
       end
